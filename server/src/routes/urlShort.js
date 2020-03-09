@@ -7,6 +7,7 @@ let domain= 'localhost:8080/';
 router.post('/', async (req, res) => {
     let input_url = req.body.obj;
     console.log(input_url);
+
     if(input_url == '' || input_url == null) {
         res.status(200).send( {
             message : "값을 입력하세요."
@@ -18,12 +19,14 @@ router.post('/', async (req, res) => {
         const query = {$or: [{ 'origin_url': {$eq: input_url} }, { 'short_url': {$eq: input_url} }]};
         const result = await db.find(query);
         console.log(result);
+        
         // 이미 존재할 경우 
         if(result) {
             return res.json({
                 shortUrl : result.short_url
             });
-        } // 없을 경우
+        } 
+        // 없을 경우
         else if(result == null) {
             let insert_url = {
                 'origin_url' : input_url,
@@ -55,6 +58,7 @@ router.post('/', async (req, res) => {
         }
     } 
 });
+
 //url 인코딩 디코딩하기 
 var ShortURL = new function() {
 	var _alphabet = '23456789bcdfghjkmnpqrstvwxyzBCDFGHJKLMNPQRSTVWXYZ-_';
