@@ -7,72 +7,53 @@ let domain= 'localhost:8080/';
 router.post('/', async (req, res) => {
     let input_url = req.body.obj;
     console.log(input_url);
-    // 공백 제거 
-    if(input_url != null) input_url = input_url.replace(/(\s*)/g, "");
-    // url 있는지 확인
-    const query = {$or: [{ 'origin_url': {$eq: input_url} }, { 'short_url': {$eq: input_url} }]};
-    const result = await db.find(query);
-    console.log(result);
-    // 이미 존재할 경우 
-    if(result._id) {
-        return res.json({
-            shortUrl : result.short_url
-        });
-    } // 없을 경우
-    else if(result == null) {
-        let insert_url = {
-            'origin_url' : input_url,
-            'short_url' : ""
-        }
-        // db insert 후 url - shortening 시행
-        const result = await db.insert(insert_url);
-        var id = result.ops[0]._id.toString(), ctr = 18;
-        var id_num = parseInt(id.slice(ctr, (ctr+=6)), 16);
-        var short_id = ShortURL.encode(id_num);
-        var short_url = domain.concat(short_id);
-
-        query = {'origin_url': input_url}, {$set: {'short_url': short_url}};
-        result = await db.update(query);
-        console.log(result);
-    } else {
-        res.status(400).send( {
-            message : "error"
+    if(input_url == '' || input_url == null) {
+        res.status(200).send( {
+            message : "값을 입력하세요."
         })
-    }
-    // try {
-    //     // 공백 제거 
-    //     if(input_url != null) input_url = input_url.replace(/(\s*)/g, "");
-    //     const query = {$or: [{ 'origin_url': {$eq: input_url} }, { 'short_url': {$eq: input_url} }]};
-    //     const result = await db.find(query);
-    //     console.log(result);
-    //     // 이미 존재할 경우 
-    //     if(result._id) {
-    //         return res.json({
-    //             shortUrl : result.short_url
-    //         });
-    //     } if(result == null) {
-    //         let insert_url = {
-    //             'origin_url' : input_url,
-    //             'short_url' : ""
-    //         }
-    //         // db insert 후 url - shortening 시행
-    //         const result = await db.insert(insert_url);
-    //         var id = result.ops[0]._id.toString(), ctr = 18;
-    //         var id_num = parseInt(id.slice(ctr, (ctr+=6)), 16);
-    //         var short_id = ShortURL.encode(id_num);
-    //         var short_url = domain.concat(short_id);
+    } else {
+        // 공백 제거 
+        input_url = input_url.replace(/(\s*)/g, "");
+        // url 있는지 확인
+        const query = {$or: [{ 'origin_url': {$eq: input_url} }, { 'short_url': {$eq: input_url} }]};
+        const result = await db.find(query);
+        console.log(result);
+        // 이미 존재할 경우 
+        if(result) {
+            return res.json({
+                shortUrl : result.short_url
+            });
+        } // 없을 경우
+        else if(result == null) {
+            let insert_url = {
+                'origin_url' : input_url,
+                'short_url' : ""
+            }
+            // db insert 후 url - shortening 시행
+            try {
+                const insert_result = await db.insert(insert_url);
+                var id = insert_result.ops[0]._id.toString(), ctr = 18;
+                var id_num = parseInt(id.slice(ctr, (ctr+=6)), 16);
+                var short_id = ShortURL.encode(id_num);
+                var short_url = domain.concat(short_id);
 
-    //         query = {'origin_url': input_url}, {$set: {'short_url': short_url}};
-    //         result = await db.update(query);
-    //         console.log(result);
-    //     }
-
-    // } catch(err) {
-    //     res.status(400).send( {
-    //         message : "error"
-    //     })
-    // }
-	
+                const query = [{'origin_url': input_url}, {$set: {'short_url': short_url}}];
+                await db.update(query);
+                console.log('성공');
+                return res.json({
+                    shortUrl : short_url
+                });
+            } catch(err) {
+                res.status(400).send( {
+                    message : err
+                })
+            }       
+        } else {
+            res.status(400).send( {
+                message : "error"
+            })
+        }
+    } 
 });
 //url 인코딩 디코딩하기 
 var ShortURL = new function() {

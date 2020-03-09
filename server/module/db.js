@@ -23,7 +23,7 @@ module.exports = {
             var db = await MongoClient.connect(mongoURI);
             db = db.db('Url');
             var result = await db.collection('shortUrl').insertOne(query);
-            console.log(result);
+            //console.log(result);
             return result;
 
         } catch(err) {
@@ -34,8 +34,8 @@ module.exports = {
         try {
             var db = await MongoClient.connect(mongoURI);
             db = db.db('Url');
-            var result = await db.collection('shortUrl').updateOne(query);
-            console.log(result);
+            var result = await db.collection('shortUrl').updateOne(query[0],query[1]);
+            //console.log(result);
             return result;
 
         } catch(err) {
