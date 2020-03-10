@@ -13,7 +13,8 @@ export const createShortUrl = obj => {
 class App extends React.Component {
   state = {
     url: '',
-    shortUrl: ''
+    shortUrl: '',
+    isUrl: false
   }
   // url 창 입력 변화 감지 함수
   handleChange = (e) => {
@@ -24,23 +25,35 @@ class App extends React.Component {
   };
   // 입력된 url 서버로 보내는 함수
   handleSubmit = (e) => {
-    e.preventDefault();
-    createShortUrl(this.state.url)
-    .then(json => {
-      console.log(json);
-      setTimeout(()=> {
-        this.setState({
-          shortUrl : json.data.shortUrl
-        });
-        this.handleReset.bind(this);
-      },0);
-    })
-    .catch(error => {
-      console.log(error);
-      alert(error);
-    });   
+    // url 유효성 검사
+    const urlRegex = /(http(s)?:\/\/)?w{3}(\.\w+)+(:[0-9]+)?(\/|\/([\w#!:.?+=&%@!\-\/]))?/;
+    const str = (this.state.url).match(urlRegex);
+    if(str == null) {
+      this.setState({
+        url : ''
+      })
+    } else {
+      this.setState({
+        url : str[0]
+      })
+      e.preventDefault();
+      createShortUrl(this.state.url)
+      .then(json => {
+        console.log(json);
+        setTimeout(()=> {
+          this.setState({
+            shortUrl : json.data.shortUrl
+          });
+          this.handleReset.bind(this);
+        },0);
+      })
+      .catch(error => {
+        console.log(error);
+        alert(error);
+      });  
+    }
   }
-// 변환된 url 받아와서 보여주는 함수
+  // 변환된 url 받아와서 보여주는 함수
   handleReset() {
     this.result.focus()
   }
@@ -65,7 +78,8 @@ class App extends React.Component {
         <h3 className="header-15">!</h3>
         </div>
       <form onSubmit={this.handleSubmit}> 
-          <input className="input"
+          <input className= "input"
+            ref={(input) => { this.url = input;}}
             placeholder="url"
             value={this.state.url}
             onChange={this.handleChange}
