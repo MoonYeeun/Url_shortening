@@ -15,25 +15,20 @@ router.post('/', async (req, res) => {
     } else {
         // 공백 제거 
         input_url = input_url.replace(/(\s*)/g, "");
-        // url 있는지 확인
-        const query = {$or: [{ 'origin_url': {$eq: input_url} }, { 'short_url': {$eq: input_url} }]};
-        const result = await db.find(query);
-        console.log(result);
-        
-        // 이미 존재할 경우 
-        if(result) {
-            return res.json({
-                shortUrl : result.short_url
-            });
-        } 
-        // 없을 경우
-        else if(result == null) {
-            let insert_url = {
-                'origin_url' : input_url,
-                'short_url' : ""
-            }
-            // db insert 후 url - shortening 시행
-            try {
+        try {
+            // url 있는지 확인
+            const query = {$or: [{ 'origin_url': {$eq: input_url} }, { 'short_url': {$eq: input_url} }]};
+            const result = await db.find(query);
+            // 이미 존재할 경우 
+            if(result) {
+                return res.json({
+                    shortUrl : result.short_url
+                });
+            } else { // 없는 경우
+                let insert_url = {
+                    'origin_url' : input_url,
+                    'short_url' : ""
+                }
                 const insert_result = await db.insert(insert_url);
                 var id = insert_result.ops[0]._id.toString(), ctr = 18;
                 var id_num = parseInt(id.slice(ctr, (ctr+=6)), 16);
@@ -46,12 +41,8 @@ router.post('/', async (req, res) => {
                 return res.json({
                     shortUrl : short_url
                 });
-            } catch(err) {
-                res.status(400).send( {
-                    message : err
-                })
-            }       
-        } else {
+            }
+        } catch(err) {
             res.status(400).send( {
                 message : "error"
             })

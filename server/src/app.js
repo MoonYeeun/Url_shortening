@@ -9,7 +9,7 @@ var logger = require('morgan');
 const app = express();
 let port = 8080;
 var urlShort = require('./routes/urlShort');
-var index = require('./main');
+var urlDirect = require('./routes/urlDirect');
 
 // SETUP MIDDLEWARE
 app.use(logger('dev'));
@@ -19,7 +19,7 @@ app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
 
 app.use('/urlShort',urlShort); // url shortening
-app.use('/', index); // url redirect 
+app.use('/', urlDirect); // url redirect 
 
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {
