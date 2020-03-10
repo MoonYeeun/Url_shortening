@@ -7,7 +7,7 @@ let domain= 'localhost:8080/';
 router.post('/', async (req, res) => {
     let input_url = req.body.obj;
     console.log(input_url);
-
+    // null 값 들어온 경우
     if(input_url == '' || input_url == null) {
         res.status(200).send( {
             message : "값을 입력하세요."
@@ -52,24 +52,24 @@ router.post('/', async (req, res) => {
 
 //url 인코딩 디코딩하기 
 var ShortURL = new function() {
-	var _alphabet = '23456789bcdfghjkmnpqrstvwxyzBCDFGHJKLMNPQRSTVWXYZ-_';
-	var _base = _alphabet.length;
+    var _alphabet = '23456789bcdfghjkmnpqrstvwxyzBCDFGHJKLMNPQRSTVWXYZ-_';
+    var _base = _alphabet.length;
 
-	this.encode = function(num) {
-		var str = '';
-		while (num > 0) {
-			str = _alphabet.charAt(num % _base) + str;
-			num = Math.floor(num / _base);
-		}
-		return str;
-	};
+    this.encode = function(num) {
+        var str = '';
+        while (num > 0) {
+            str = _alphabet.charAt(num % _base) + str;
+            num = Math.floor(num / _base);
+        }
+        return str;
+    };
 
-	this.decode = function(str) {
-		var num = 0;
-		for (var i = 0; i < str.length; i++) {
-			num = num * _base + _alphabet.indexOf(str.charAt(i));
-		}
-		return str;
+    this.decode = function(str) {
+        var num = 0;
+        for (var i = 0; i < str.length; i++) {
+            num = num * _base + _alphabet.indexOf(str.charAt(i));
+        }
+        return str;
     };
 }
 module.exports = router;
