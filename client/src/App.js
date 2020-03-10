@@ -40,22 +40,15 @@ class App extends React.Component {
       createShortUrl(this.state.url)
       .then(json => {
         console.log(json);
-        setTimeout(()=> {
-          this.setState({
-            shortUrl : json.data.shortUrl
-          });
-          this.handleReset.bind(this);
-        },0);
+        this.setState({
+          shortUrl : json.data.shortUrl
+        });
       })
       .catch(error => {
         console.log(error);
         alert(error);
       });  
     }
-  }
-  // 변환된 url 받아와서 보여주는 함수
-  handleReset() {
-    this.result.focus()
   }
   render() {
     return (
