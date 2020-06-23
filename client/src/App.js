@@ -4,52 +4,53 @@ import axios from "axios";
 
 // url 줄이기 위해 서버로 보냄
 export const createShortUrl = obj => {
-  console.log(obj);
   return axios.post('/urlShort', {
     obj : obj
   })
 };
 
-class App extends React.Component {
+class App extends Component {
   state = {
     url: '',
     shortUrl: '',
     isUrl: false
   }
-  // url 창 입력 변화 감지 함수
+
+  // url 창 입력 변화 감지
   handleChange = (e) => {
     this.setState({
       url: e.target.value,
       shortUrl: ''
     });
   };
-  // 입력된 url 서버로 보내는 함수
+
+  // 입력된 url 서버로 보내기
   handleSubmit = (e) => {
+    let { url } = this.state;
     // url 유효성 검사
     const urlRegex = /(http(s)?:\/\/)?w{3}(\.\w+)+(:[0-9]+)?(\/|\/([\w#!:.?+=&%@!\-\/]))?/;
-    const str = (this.state.url).match(urlRegex);
+    url = url.replace(/(\s*)/g, ""); // 공백제거
+    const str = url.match(urlRegex);
+
     if(str == null) {
-      this.setState({
-        url : ''
-      })
+      alert('올바른 주소 값을 입력하세요.');
+
+      this.setState({url : ''});
     } else {
-      this.setState({
-        url : str[0]
-      })
       e.preventDefault();
-      createShortUrl(this.state.url)
+
+      createShortUrl(str[0])
       .then(json => {
-        console.log(json);
         this.setState({
           shortUrl : json.data.shortUrl
         });
       })
       .catch(error => {
-        console.log(error);
         alert(error);
       });  
     }
   }
+
   render() {
     return (
       <div className ="App">
@@ -72,7 +73,6 @@ class App extends React.Component {
         </div>
       <form onSubmit={this.handleSubmit}> 
           <input className= "input"
-            ref={(input) => { this.url = input;}}
             placeholder="url"
             value={this.state.url}
             onChange={this.handleChange}

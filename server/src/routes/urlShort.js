@@ -13,14 +13,14 @@ router.post('/', async (req, res) => {
             message : "값을 입력하세요."
         })
     } else {
-        // 공백 제거 
-        input_url = input_url.replace(/(\s*)/g, "");
         try {
             // url 있는지 확인
             const query = {$or: [{ 'origin_url': {$eq: input_url} }, { 'short_url': {$eq: input_url} }]};
             const result = await db.find(query);
+            
             // 이미 존재할 경우 
             if(result) {
+                console.log(result);
                 return res.json({
                     shortUrl : result.short_url
                 });
@@ -30,14 +30,14 @@ router.post('/', async (req, res) => {
                     'short_url' : ""
                 }
                 const insert_result = await db.insert(insert_url);
-                var id = insert_result.ops[0]._id.toString(), ctr = 18;
-                var id_num = parseInt(id.slice(ctr, (ctr+=6)), 16);
-                var short_id = ShortURL.encode(id_num);
-                var short_url = domain.concat(short_id);
+                let id = insert_result.ops[0]._id.toString(), ctr = 18;
+                let id_num = parseInt(id.slice(ctr, (ctr+=6)), 16);
+                let short_id = ShortURL.encode(id_num);
+                let short_url = domain.concat(short_id);
 
                 const query = [{'origin_url': input_url}, {$set: {'short_url': short_url}}];
                 await db.update(query);
-                console.log('성공');
+                
                 return res.json({
                     shortUrl : short_url
                 });
@@ -51,12 +51,12 @@ router.post('/', async (req, res) => {
 });
 
 //url 인코딩 디코딩하기 
-var ShortURL = new function() {
-    var _alphabet = '23456789bcdfghjkmnpqrstvwxyzBCDFGHJKLMNPQRSTVWXYZ-_';
-    var _base = _alphabet.length;
+let ShortURL = new function() {
+    let _alphabet = '23456789bcdfghjkmnpqrstvwxyzBCDFGHJKLMNPQRSTVWXYZ-_';
+    let _base = _alphabet.length;
 
     this.encode = function(num) {
-        var str = '';
+        let str = '';
         while (num > 0) {
             str = _alphabet.charAt(num % _base) + str;
             num = Math.floor(num / _base);
@@ -65,8 +65,8 @@ var ShortURL = new function() {
     };
 
     this.decode = function(str) {
-        var num = 0;
-        for (var i = 0; i < str.length; i++) {
+        let num = 0;
+        for (let i = 0; i < str.length; i++) {
             num = num * _base + _alphabet.indexOf(str.charAt(i));
         }
         return str;

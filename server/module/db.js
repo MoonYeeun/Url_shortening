@@ -9,9 +9,9 @@ const connectOptions = {
 module.exports = {
     find: async(query) => {
         try {
-            var db = await MongoClient.connect(mongoURI);
+            let db = await MongoClient.connect(mongoURI, {useUnifiedTopology:true});
             db = db.db('Url');
-            var result = await db.collection('shortUrl').findOne(query);
+            const result = await db.collection('shortUrl').findOne(query);
             return result;
 
         } catch(err) {
@@ -20,10 +20,10 @@ module.exports = {
     },
     insert: async(query) => {
         try {
-            var db = await MongoClient.connect(mongoURI);
+            let db = await MongoClient.connect(mongoURI, {useUnifiedTopology:true});
             db = db.db('Url');
-            var result = await db.collection('shortUrl').insertOne(query);
-            //console.log(result);
+            const result = await db.collection('shortUrl').insertOne(query);
+
             return result;
 
         } catch(err) {
@@ -32,10 +32,10 @@ module.exports = {
     },
     update: async(query) => {
         try {
-            var db = await MongoClient.connect(mongoURI);
+            let db = await MongoClient.connect(mongoURI, {useUnifiedTopology:true});
             db = db.db('Url');
-            var result = await db.collection('shortUrl').updateOne(query[0],query[1]);
-            //console.log(result);
+            const result = await db.collection('shortUrl').updateOne(query[0],query[1]);
+
             return result;
 
         } catch(err) {

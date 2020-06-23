@@ -112,6 +112,7 @@
   height: 35px;
   background: #22b8cf;
   border-radius: 3px;
+  border: 0;
   color: white;
   font-weight: 600;
   cursor: pointer;
